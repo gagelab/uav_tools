@@ -4,8 +4,9 @@ channels:
   - defaults
 dependencies:
   - python==3.10
-  - lapspy[version='<2.0.0']
+  - laspy<2.0.0
   - numpy
+  - pip
   - pip:
     - laxpy
     - pyshp
