@@ -16,8 +16,7 @@ PROGRAM_EPILOGUE = "Written by Joe Gage, 2024."
 # las_file = "/Volumes/gagelab/ProcessedUAVData/DJI_202307271046_003_G2F2023/DJI_202307271046_003_G2F-2023_20231220T1220_points.las"
 # plot_idx = 230
 
-# get_shapes copied from Lucas Bauer's orthoslice
-# https://github.com/gagelab/orthoslice/blob/main/orthoslice.py
+# get_shapes copied from Lucas Bauer's slice_orthomosaic.py
 def get_shapes(shp_file):
     """Shapefile -> points, (x,y) format, geographic coordinates
     """
@@ -131,7 +130,6 @@ if __name__ == '__main__':
     else:
         plot_idxs = range(len(shp))
 
-    print(len(shp))
     for i in plot_idxs:
         # Read indexed LAS and subset to the desired plot index
         subset_las = IndexedLAS(args.lasfile_path)
@@ -157,6 +155,10 @@ if __name__ == '__main__':
             theta = find_theta(p)
             # Rotate plot points around Z axis (0,0,1)
             pcd_out = rodrigues_rotation(pcd, (0,0,1), theta)
+            # Center plot
+            pcd_out[:, 0] = pcd_out[:, 0] - np.mean(pcd_out[:, 0])
+            pcd_out[:, 1] = pcd_out[:, 1] - np.min(pcd_out[:, 1])
+            pcd_out[:, 2] = pcd_out[:, 2] - np.min(pcd_out[:, 2])
         else:
             pcd_out = pcd
 
@@ -166,8 +168,8 @@ if __name__ == '__main__':
 
         # Write out new LAS
         if args.xyz:
-            outfile=outfile+".txt"
-            np.savetxt(outfile, pcd_out)
+            outfile=outfile+".txt.gz"
+            np.savetxt(outfile,  pcd_out, fmt='%.6f',)
         else:
             outfile=outfile+".las"
             header = laspy.header.Header(file_version=subset_las.header.version, point_format=subset_las.header.data_format_id)
