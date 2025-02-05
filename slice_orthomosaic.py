@@ -160,7 +160,11 @@ def slice_bbox_correct(open_raster, bbox, points_list, final_resolution=(2048, 1
 
     # Prepare destination points
     res_h, res_w = final_resolution
-    dest_pts = [(0,0), (res_w, 0), (res_w, res_h), (0,res_h)]
+    # Original dest_pts:
+    # dest_pts = [(0,0), (res_w, 0), (res_w, res_h), (0,res_h)]
+    # Modified dest_pts to rotate output 90 degrees
+    dest_pts = [(0,res_h), (0, 0), (res_w, 0), (res_w, res_h)]
+
 
     return keystone_correct(data, points_converted, dest_pts, np.zeros((*final_resolution, 3)))
 
